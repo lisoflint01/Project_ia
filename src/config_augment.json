@@ -1,0 +1,5 @@
+{
+  "train_dir": "dataset/train",
+  "target_ratio": 0.25,
+  "seed": 42
+}

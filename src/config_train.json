@@ -1,0 +1,29 @@
+{
+  "train_dir": "dataset/train",
+  "val_dir": "dataset/val",
+  "out_dir": "out/exp01",
+
+  "img_size": 224,
+  "batch_size": 32,
+  "epochs": 20,
+  "learning_rate": 0.001,
+
+  "device": "auto",
+  "seed": 42,
+
+  "pretrained": true,
+  "freeze_backbone": false,
+  "dropout_p": 0.5,
+
+  "model_name": "resnet18",
+
+  "tensorboard_enabled": true,
+  "log_dir": null,
+
+  "weights_path": null,
+  "resume_from": null,
+
+  "early_stopping_enabled": false,
+  "early_stopping_patience": 5,
+  "target_accuracy": null
+}

@@ -1,0 +1,12 @@
+{
+
+  "test_dir": "dataset/test",
+  "out_dir": "out/exp01",
+
+  "img_size": 224,
+  "batch_size": 32,
+
+  "device": "auto",
+  "seed": 42
+
+}

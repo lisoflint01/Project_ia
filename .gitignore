@@ -1,16 +1,1 @@
-# Virtual environment
-.venv/
 
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-
-# Dataset (se non versioni i dati)
-dataset/
-.vscode/settings.json
-src/__pycache__/train.cpython-311.pyc
-
-#ingore train model and label 
-*.pt
-labels.json

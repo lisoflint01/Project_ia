@@ -88,7 +88,7 @@ def train(cfg: dict, model, train_loader, val_loader, loss, optimizer, device, r
     patience = cfg.get("early_stopping_patience", 10)
     target_accuracy = cfg.get("target_accuracy", None)
     
-    checkpoint_every = max(1, epochs // 5)
+    checkpoint_every = cfg.get("checkpoint_every", None)
     
     # TensorBoard
     tb_enabled = cfg.get("tensorboard_enabled", False)
@@ -104,9 +104,12 @@ def train(cfg: dict, model, train_loader, val_loader, loss, optimizer, device, r
     
     # Epoch loop
     for epoch in range(start_epoch, epochs):
-        print(f"epoch number:{epoch}")
         # Measure epoch execution time 
         t0 = time.time()
+
+        epoch_human = epoch + 1
+        print(f"epoch number:{epoch_human}")
+        
         
         # Train
         model.train()
@@ -160,7 +163,9 @@ def train(cfg: dict, model, train_loader, val_loader, loss, optimizer, device, r
         val_acc_epoch = correct_predictions / total_prediction
         
         epoch_time = time.time() - t0
-            
+
+        print(f"train_loss: {train_loss_epoch}\tval_loss: {val_loss_epoch}\tval_acc: {val_acc_epoch}\n")            
+        
         # History
         set_train.update_history(history, train_loss_epoch, val_loss_epoch, val_acc_epoch, epoch_time)
         
@@ -178,16 +183,21 @@ def train(cfg: dict, model, train_loader, val_loader, loss, optimizer, device, r
             bad_epochs += 1
         
         # Save snapshot weights
-        if (epoch + 1) % checkpoint_every == 0:
-            set_train.save_checkpoint(model, optimizer, result_dir, epoch, best_metric)      
-                  
+        if checkpoint_every and (epoch_human % checkpoint_every == 0):
+            set_train.save_checkpoint(model, optimizer, result_dir, epoch_human, best_metric)
+        
+        # TensorBoard: every epoch 
+        if writer is not None:
+            set_train.tensorboard(writer, epoch_human, train_loss_epoch, val_loss_epoch, val_acc_epoch, epoch_time)
+
+
         # Early Stop
         if set_train.early_stop(val_acc_epoch, best_metric, bad_epochs, patience, early_stop, target_accuracy):
+            print(f"\nearly stop {early_stop}")
             break
             
 
     if writer is not None:
-        set_train.tensorboard(writer, epoch, train_loss_epoch, val_loss_epoch, val_acc_epoch, epoch_time)
         writer.close()
         
     set_train.save_history(history, result_dir)

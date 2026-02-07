@@ -41,6 +41,8 @@ def pick_device(mode: str = None) -> torch.device:
     # Gestion error
     else:
         device = torch.device("cpu")
+
+    print(device)
         
     return device
 

@@ -1,0 +1,22 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# TensorBoard / logs
+runs/
+tensorboard/
+*.tfevents*
+
+# Training outputs (se rigenerabili)
+out/
+checkpoints/
+
+# Dataset (se non versioni i dati)
+dataset/
+.vscode/settings.json
+src/__pycache__/train.cpython-311.pyc
+src/__pycache__/train.cpython-311.pyc

@@ -1,17 +1,17 @@
 {
   "train_dir": "dataset/train",
   "val_dir": "dataset/val",
-  "out_dir": "out/exp01",
+  "out_dir": "out/exp10",
 
-  "img_size": 224,
-  "batch_size": 32,
+  "img_size": 300,
+  "batch_size": 1,
   "epochs": 20,
-  "learning_rate": 0.001,
+  "learning_rate": 0.0001,
 
   "device": "auto",
   "seed": 42,
 
-  "pretrained": true,
+  "pretrained": false,
   "freeze_backbone": false,
   "dropout_p": 0.5,
 
@@ -23,7 +23,8 @@
   "weights_path": null,
   "resume_from": null,
 
-  "early_stopping_enabled": false,
-  "early_stopping_patience": 5,
-  "target_accuracy": null
+  "early_stopping_enabled": true,
+  "early_stopping_patience": 10,
+  "target_accuracy": null,
+  "checkpoint_every": 5
 }

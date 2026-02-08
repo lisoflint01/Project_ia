@@ -1,6 +1,7 @@
 import random
 from pathlib import Path
 import json
+from jsonschema import validate, ValidationError
 
 import torch
 from PIL import Image
@@ -67,6 +68,16 @@ def main():
     
     with open(Path(__file__).parent / "config_augment.json") as f:
         json_cfg = json.load(f)
+
+    # Import Json schema
+    with open(Path(__file__).parent / "config_augment.schema.json", "r", encoding="utf-8") as f:
+        schema = json.load(f)
+
+    # validate
+    try:
+        validate(instance=json_cfg, schema=schema)
+    except ValidationError as e:
+        raise SystemExit(f"[CONFIG ERROR] {e.message}")
         
     train_dir = Path(json_cfg["train_dir"])
     target_ratio = json_cfg["target_ratio"]

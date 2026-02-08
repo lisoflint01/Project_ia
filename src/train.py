@@ -1,4 +1,5 @@
 import json
+from jsonschema import validate, ValidationError
 from pathlib import Path
 import time
 
@@ -15,6 +16,16 @@ def init():
     # Import json
     with open(Path(__file__).parent / "config_train.json", "r", encoding="utf-8") as f:
         cfg = json.load(f)
+
+    # Import Json schema
+    with open(Path(__file__).parent / "config_train.schema.json", "r", encoding="utf-8") as f:
+        schema = json.load(f)
+
+    # validate
+    try:
+        validate(instance=cfg, schema=schema)
+    except ValidationError as e:
+        raise SystemExit(f"[CONFIG ERROR] {e.message}")
     
     # Set seed
     data_model.set_seed(cfg["seed"])
@@ -34,7 +45,7 @@ def set_run(cfg: dict, device):
     train_loader, val_loader, classes = data_model.prepare_dataset(cfg["train_dir"], cfg["val_dir"], cfg["batch_size"], cfg["img_size"], result_dir, device = device)
     
     # Build classification model
-    model = data_model.build_model(len(classes), cfg["freeze_backbone"], cfg["pretrained"], dropout=cfg["dropout_p"])
+    model = data_model.build_model(len(classes), cfg["freeze_backbone"], cfg["pretrained"], dropout=cfg["dropout_p"], model_name=cfg.get("model_name", "resnet18"))
     model = model.to(device)
 
     return result_dir, train_loader, val_loader, classes, model

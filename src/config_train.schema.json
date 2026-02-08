@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "required": ["train_dir", "val_dir", "out_dir", "epochs", "batch_size", "learning_rate", "seed"],
+  "properties": {
+    
+    "train_dir": { "type": "string" },
+    "val_dir": { "type": "string" },
+    "out_dir": { "type": "string" },
+
+    "epochs": { "type": "integer", "minimum": 1 },
+    "batch_size": { "type": "integer", "minimum": 1 },
+    "learning_rate": { "type": "number", "exclusiveMinimum": 0 },
+    
+    "seed": { "type": "integer" }
+  }
+}

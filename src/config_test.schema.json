@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "required": ["test_dir", "out_dir", "img_size", "batch_size"],
+  "properties": {
+    "test_dir": { "type": "string" },
+    "out_dir": { "type": "string" },
+    "img_size": { "type": "integer", "minimum": 1 },
+    "batch_size": { "type": "integer", "minimum": 1 }
+  }
+}

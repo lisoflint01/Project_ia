@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "required": ["train_dir","seed"],
+  
+  "properties": {
+    
+    "train_dir": { "type": "string" },
+
+    "target_ratio": { "type": "number", "minimum": 0, "maximum": 1 },
+ 
+    "seed": { "type": "integer" }
+    
+  }
+}

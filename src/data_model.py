@@ -11,6 +11,28 @@ from torch.utils.data import DataLoader
 
 from torchvision.models import resnet18, ResNet18_Weights
 
+
+class my_IA(nn.Module):
+    def __init__(self, num_classes: int):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Conv2d(3, 16, 3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+
+            nn.Conv2d(16, 32, 3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(),
+            nn.Linear(32, num_classes)
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+
 # Select device
 def pick_device(mode: str = None) -> torch.device:
     if mode is None:
@@ -127,9 +149,14 @@ def prepare_dataset(train_dir: str, val_dir: str, batch_size: int, img_size: int
     return train_loader, val_loader, classes
 
 # Build
-def build_model(num_classes: int, freeze_backbone: bool = False, pretrained: bool = True, dropout: float = 0.5):
+def build_model(num_classes, freeze_backbone=False, pretrained=True, dropout=0.5, model_name="resnet18"):
+
     
-    # Select weights
+    
+
+    # Select Model and weights
+    if model_name == "my_IA":
+        return my_IA(num_classes)
     if pretrained:
         weights = ResNet18_Weights.DEFAULT
     else:

@@ -1,4 +1,5 @@
 import json
+from jsonschema import validate, ValidationError
 from pathlib import Path
 
 import torch
@@ -12,9 +13,18 @@ import data_model
 def init(path: Path) -> dict:
     
     # Json
-    cfg_path = Path(__file__).parent / "config_test.json"
-    with open(cfg_path, "r", encoding="utf-8") as f:
+    with open(Path(__file__).parent / "config_test.json", "r", encoding="utf-8") as f:
         cfg = json.load(f)
+
+    # Import Json schema
+    with open(Path(__file__).parent / "config_test.schema.json", "r", encoding="utf-8") as f:
+        schema = json.load(f)
+
+    # validate
+    try:
+        validate(instance=cfg, schema=schema)
+    except ValidationError as e:
+        raise SystemExit(f"[CONFIG ERROR] {e.message}")
 
     # Seed
     data_model.set_seed(cfg["seed"])

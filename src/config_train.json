@@ -1,12 +1,12 @@
 {
   "train_dir": "dataset/train",
   "val_dir": "dataset/val",
-  "out_dir": "out/exp10",
+  "out_dir": "out/exp16",
 
   "img_size": 300,
-  "batch_size": 1,
-  "epochs": 20,
-  "learning_rate": 0.0001,
+  "batch_size": 40,
+  "epochs": 10,
+  "learning_rate": 0.001,
 
   "device": "auto",
   "seed": 42,
@@ -15,7 +15,7 @@
   "freeze_backbone": false,
   "dropout_p": 0.5,
 
-  "model_name": "resnet18",
+  "model_name": "my_IA",
 
   "tensorboard_enabled": true,
   "log_dir": null,
@@ -23,7 +23,7 @@
   "weights_path": null,
   "resume_from": null,
 
-  "early_stopping_enabled": true,
+  "early_stopping_enabled": false,
   "early_stopping_patience": 10,
   "target_accuracy": null,
   "checkpoint_every": 5

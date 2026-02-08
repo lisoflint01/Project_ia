@@ -15,12 +15,15 @@ from torchvision.models import resnet18, ResNet18_Weights
 class my_IA(nn.Module):
 
     # Neaural Network for classification
-    def __init__(self, num_classes: int):
+    def __init__(self, num_classes: int, dropout_p: float = 0.5):
         super().__init__()
         self.net = nn.Sequential(
             # convoluzione 3 (RGB), 16 output (IMG), kernel size 3 (SCORRIMENTO), padding 1 (RIEMPIMENTO)
             nn.Conv2d(3, 16, 3, padding=1),
-            
+
+            # normalizzazione per stabilizzare e accelerare l'addestramento
+            nn.BatchNorm2d(16),
+
             #introduce non linearità nel modello, regole più complesse
             nn.ReLU(),
 
@@ -30,31 +33,38 @@ class my_IA(nn.Module):
 
             # prende l'output del primo blocco e lo elabora con un altro blocco
             nn.Conv2d(16, 32, 3, padding=1),
+            nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(2),
 
 
             # prende l'output del secondo blocco e lo elabora con un altro blocco
             nn.Conv2d(32, 64, 3, padding=1),
+            nn.BatchNorm2d(64),
             nn.ReLU(),
             nn.AvgPool2d(2),
             
+
             # prende l'output del terzo blocco e lo elabora con un altro blocco
             nn.Conv2d(64, 32, 3, padding=1),
+            nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(2),
 
+
             # prende l'output del quarto blocco e lo elabora con un altro blocco
             nn.Conv2d(32, 64, 3, padding=1),
+            nn.BatchNorm2d(64),
             nn.ReLU(),
-            nn.AvgPool2d(2),
+            nn.MaxPool2d(2),
+
 
             # Media globale: 1 valore per canale
             nn.AdaptiveAvgPool2d((1, 1)),
-
             # Da tensore a vettore
             nn.Flatten(),
-
+            # Dropout per regolarizzazione
+            nn.Dropout(p=dropout_p),
             # Layer di classificazione finale
             nn.Linear(64, num_classes)
         )
@@ -174,7 +184,7 @@ def build_model(num_classes, freeze_backbone=False, pretrained=True, dropout=0.5
 
     # Select Model and weights
     if model_name == "my_IA":
-        return my_IA(num_classes)
+        return my_IA(num_classes, dropout)
     if pretrained:
         weights = ResNet18_Weights.DEFAULT
     else:

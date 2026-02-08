@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 
 from torchvision.models import resnet18, ResNet18_Weights
 
-# Select device, cuda or gpu
+# Select device
 def pick_device(mode: str = None) -> torch.device:
     if mode is None:
         mode = "auto"

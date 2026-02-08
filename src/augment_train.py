@@ -11,10 +11,10 @@ from image_transforms import is_image, to_rgb, save_jpg, TRANSFORMS
 # Return all real images in directory
 def list_images(class_dir: Path, only_real: bool = False) -> list[Path]:
     
-    imgs = [p for p in class_dir.iterdir() if p.is_file() and is_image(p)]
+    imgs = [img_path for img_path in class_dir.iterdir() if img_path.is_file() and is_image(img_path)]
     
     if only_real:    
-        imgs = [p for p in imgs if "aug_" not in p.stem]
+        imgs = [img_path for img_path in imgs if "aug_" not in img_path.stem]
 
     return imgs
 
@@ -78,7 +78,7 @@ def main():
         validate(instance=json_cfg, schema=schema)
     except ValidationError as e:
         raise SystemExit(f"[CONFIG ERROR] {e.message}")
-        
+       
     train_dir = Path(json_cfg["train_dir"])
     target_ratio = json_cfg["target_ratio"]
     seed = json_cfg["seed"]

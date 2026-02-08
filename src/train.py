@@ -13,7 +13,6 @@ import set_train
 # Set variable
 def init():
     
-    # Import json
     with open(Path(__file__).parent / "config_train.json", "r", encoding="utf-8") as f:
         cfg = json.load(f)
 
@@ -27,24 +26,20 @@ def init():
     except ValidationError as e:
         raise SystemExit(f"[CONFIG ERROR] {e.message}")
     
-    # Set seed
     data_model.set_seed(cfg["seed"])
     
-    # Set device
     device = data_model.pick_device(cfg["device"])
     
     return cfg, device
 
-# Set Run
+# Set directory, model and dataloader
 def set_run(cfg: dict, device):
 
-    # Make output directory
     result_dir = set_train.init_set(cfg["out_dir"])
     
-    # Dataset
     train_loader, val_loader, classes = data_model.prepare_dataset(cfg["train_dir"], cfg["val_dir"], cfg["batch_size"], cfg["img_size"], result_dir, device = device)
     
-    # Build classification model
+    # Select model
     model = data_model.build_model(len(classes), cfg["freeze_backbone"], cfg["pretrained"], dropout=cfg["dropout_p"], model_name=cfg.get("model_name", "resnet18"))
     model = model.to(device)
 
@@ -53,12 +48,11 @@ def set_run(cfg: dict, device):
 # Update model parameters
 def set_optimizer(cfg: dict, model):
     
-    # Loss function
     loss = nn.CrossEntropyLoss()
 
     # Optimizer
     optimizer = torch.optim.Adam(
-        [p for p in model.parameters() if p.requires_grad],
+        [param  for param in model.parameters() if param.requires_grad],
         lr=cfg["learning_rate"]
     )
 
@@ -67,7 +61,6 @@ def set_optimizer(cfg: dict, model):
 # Resume weight loader
 def set_resume(cfg: dict, model, optimizer, device):
     
-    # Set 
     start_epoch = 0
     best_metric = 0.0
     
@@ -93,7 +86,6 @@ def set_resume(cfg: dict, model, optimizer, device):
 # Train
 def train(cfg: dict, model, train_loader, val_loader, loss, optimizer, device, result_dir: Path, start_epoch: int, best_metric: float):
     
-    # setup
     epochs = cfg["epochs"]
     early_stop = cfg.get("early_stopping_enabled", False)    
     patience = cfg.get("early_stopping_patience", 10)
@@ -115,18 +107,17 @@ def train(cfg: dict, model, train_loader, val_loader, loss, optimizer, device, r
     
     # Epoch loop
     for epoch in range(start_epoch, epochs):
-        # Measure epoch execution time 
+         
         t0 = time.time()
 
         epoch_human = epoch + 1
         print(f"epoch number:{epoch_human}")
         
-        
         # Train
         model.train()
         train_loss_sum = 0.0
         
-        # Batch train
+        # Batch
         for images, labels in train_loader:
             images = images.to(device)
             labels = labels.to(device)
@@ -134,7 +125,7 @@ def train(cfg: dict, model, train_loader, val_loader, loss, optimizer, device, r
             # reset gradient
             optimizer.zero_grad()
             
-            # Loss, scalar number (tensor)
+            # Loss batch
             outputs = model(images)
             batch_loss = loss(outputs, labels)
             
@@ -154,13 +145,13 @@ def train(cfg: dict, model, train_loader, val_loader, loss, optimizer, device, r
         correct_predictions = 0
         total_prediction = 0
         
-        # Batch val
+        # Batch
         with torch.no_grad():
             for images, labels in val_loader:
                 images = images.to(device)
                 labels = labels.to(device)
                 
-                # Loss, scalar number (tensor)
+                # Loss
                 outputs = model(images)
                 val_loss = loss(outputs, labels)
                 val_loss_sum += val_loss.item()
@@ -177,10 +168,8 @@ def train(cfg: dict, model, train_loader, val_loader, loss, optimizer, device, r
 
         print(f"train_loss: {train_loss_epoch}\tval_loss: {val_loss_epoch}\tval_acc: {val_acc_epoch}\n")            
         
-        # History
         set_train.update_history(history, train_loss_epoch, val_loss_epoch, val_acc_epoch, epoch_time)
         
-        # Save Last model
         set_train.save_last_model(model, result_dir)
         
         # Save Best model
@@ -200,7 +189,6 @@ def train(cfg: dict, model, train_loader, val_loader, loss, optimizer, device, r
         # TensorBoard: every epoch 
         if writer is not None:
             set_train.tensorboard(writer, epoch_human, train_loss_epoch, val_loss_epoch, val_acc_epoch, epoch_time)
-
 
         # Early Stop
         if set_train.early_stop(val_acc_epoch, best_metric, bad_epochs, patience, early_stop, target_accuracy):

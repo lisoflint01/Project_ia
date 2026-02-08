@@ -12,7 +12,6 @@ import data_model
 # Init Test
 def init(path: Path) -> dict:
     
-    # Json
     with open(Path(__file__).parent / "config_test.json", "r", encoding="utf-8") as f:
         cfg = json.load(f)
 
@@ -26,10 +25,8 @@ def init(path: Path) -> dict:
     except ValidationError as e:
         raise SystemExit(f"[CONFIG ERROR] {e.message}")
 
-    # Seed
     data_model.set_seed(cfg["seed"])
     
-    # Device
     device = data_model.pick_device(cfg.get("device", "auto"))
     
     return cfg, device
@@ -52,7 +49,6 @@ def load_labels(out_dir: Path):
 # Evaluate best model
 def evaluate(model, loader, criterion, device):
     
-    # Evaluation mode
     model.eval()
     loss_sum = 0.0
     correct = 0
@@ -60,19 +56,17 @@ def evaluate(model, loader, criterion, device):
 
     # No gradients
     with torch.no_grad():
+        
         # Batch loop
         for images, labels in loader:
             images = images.to(device)
             labels = labels.to(device)
 
-            # Model prediction
             outputs = model(images)
             loss = criterion(outputs, labels)
             
-            # Batch size
             batch_size = labels.size(0)
             
-            # Update metrics
             loss_sum += loss.item() * batch_size
             preds = torch.argmax(outputs, dim=1)
             correct += (preds == labels).sum().item()
@@ -87,22 +81,23 @@ def evaluate(model, loader, criterion, device):
 # Preparation test
 def build_test(cfg: dict, test_dir: Path, out_dir: Path, device):
     
-    # Dataset and dataloader
     test_dataset  = ImageFolder(root=str(test_dir), transform=data_model.get_val_transform(cfg["img_size"]))
     test_loader  = DataLoader(test_dataset, batch_size=cfg["batch_size"], shuffle=False, pin_memory=(device.type == "cuda"))
 
-    # Load training labels
+    
     train_classes = load_labels(out_dir)
-    if train_classes is not None:
+    
+    # Check class loaded
+    if train_classes is not None:    
         
         # Check class order
         if train_classes != list(test_dataset.classes):
             raise ValueError("Ordine classi diverso tra training(labels.json) e test(ImageFolder)")
-        # Classes from training
+        
+
         num_classes = len(train_classes)
     
     else:
-        # Classes from test
         num_classes = len(test_dataset.classes)
 
 
@@ -111,10 +106,7 @@ def build_test(cfg: dict, test_dir: Path, out_dir: Path, device):
 # Test best model
 def test(cfg: dict, device, test_dir: Path, out_dir: Path) -> dict:
     
-    # Build test setup
     test_dataset, test_loader, num_classes = build_test(cfg, test_dir, out_dir, device)
-
-    # Build model
     model = data_model.build_model(num_classes=num_classes, freeze_backbone=cfg.get("freeze_backbone", False), pretrained=cfg.get("pretrained", True), dropout=cfg.get("dropout_p", 0.5),).to(device)
     
     # Load best model
@@ -130,8 +122,6 @@ def test(cfg: dict, device, test_dir: Path, out_dir: Path) -> dict:
     # Evaluate
     criterion = nn.CrossEntropyLoss()
     test_loss, test_acc, n = evaluate(model, test_loader, criterion, device)
-
-    # Build results
     results = {"test_dir": str(test_dir), "out_dir": str(out_dir), "best_model_path": str(best_path), "num_samples": int(n), "test_loss": float(test_loss), "test_accuracy": float(test_acc), "device": str(device), "classes": list(test_dataset.classes),}
 
     # Save result
@@ -147,7 +137,6 @@ def main():
     
     cfg, device = init()
 
-    # Path
     test_dir = Path(cfg["test_dir"])
     out_dir = Path(cfg["out_dir"])
 
@@ -157,7 +146,7 @@ def main():
     if not out_dir.exists():
         raise FileNotFoundError(f"Cartella out_dir non trovata: {out_dir}")
 
-    # Run test
+
     results = test(cfg, device, test_dir, out_dir)
     print(f"Test Results\nLoss: {results['test_loss']:.4f}\nAccuracy: {results['test_accuracy']:.4f}\nSamples: {results['num_samples']}\nModel: {results['best_model_path']}"
 )

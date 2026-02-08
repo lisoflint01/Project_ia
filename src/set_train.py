@@ -28,8 +28,8 @@ def save_best_model(model, result_dir: Path) -> None:
 # Checkpoint of weight
 def save_checkpoint(model, optimizer, result_dir: Path, epoch: int, best_metric: float) -> None:
     
-    # Create result checkpoint for this epoch
     checkpoint_path = result_dir / "checkpoints" / f"epoch_{epoch}.pt"
+    
     torch.save({"epoch": epoch, "best_metric": best_metric, "model_state": model.state_dict(), "optimizer_state": optimizer.state_dict()}, checkpoint_path)
          
 # Save history

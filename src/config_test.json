@@ -1,7 +1,7 @@
 {
 
   "test_dir": "dataset/test",
-  "out_dir": "out/exp01",
+  "out_dir": "out/exp02",
 
   "img_size": 224,
   "batch_size": 32,

@@ -10,7 +10,7 @@ from torchvision.datasets import ImageFolder
 import data_model
 
 # Init Test
-def init(path: Path) -> dict:
+def init():
     
     with open(Path(__file__).parent / "config_test.json", "r", encoding="utf-8") as f:
         cfg = json.load(f)
@@ -73,7 +73,7 @@ def evaluate(model, loader, criterion, device):
             total += batch_size
 
     # Final metrics
-    avg_loss = loss_sum / max(1, len(total))
+    avg_loss = loss_sum / max(1, total)
     acc = correct / max(1, total)
     
     return avg_loss, acc, total

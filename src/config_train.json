@@ -1,21 +1,21 @@
 {
   "train_dir": "dataset/train",
   "val_dir": "dataset/val",
-  "out_dir": "out/exp13",
+  "out_dir": "out/exp003",
 
   "img_size": 300,
-  "batch_size": 40,
-  "epochs": 100,
-  "learning_rate": 0.001,
+  "batch_size": 50,
+  "epochs": 20,
+  "learning_rate": 0.01,
 
-  "device": "auto",
+  "device": "cuda",
   "seed": 42,
 
   "pretrained": false,
   "freeze_backbone": false,
   "dropout_p": 0.5,
 
-  "model_name": "resnet18",
+  "model_name": "my_IA",
 
   "tensorboard_enabled": true,
   "log_dir": null,

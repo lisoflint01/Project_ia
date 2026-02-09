@@ -1,0 +1,16 @@
+{
+  "test_dir": "dataset\\test",
+  "out_dir": "out\\exp03",
+  "best_model_path": "out\\exp03\\best_model.pt",
+  "num_samples": 500,
+  "test_loss": 0.6293975071907043,
+  "test_accuracy": 0.812,
+  "device": "cuda",
+  "classes": [
+    "cat",
+    "dog",
+    "elephant",
+    "horse",
+    "lion"
+  ]
+}
